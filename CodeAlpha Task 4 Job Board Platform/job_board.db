@@ -1,0 +1,58 @@
+import sqlite3
+
+DB_NAME = "job_board.db"
+
+def seed_database():
+    conn = sqlite3.connect(DB_NAME)
+    conn.execute("PRAGMA foreign_keys = ON;")
+    cursor = conn.cursor()
+
+    print("🌱 Seeding job_board.db tables with professional mock data...")
+
+    # 1. Insert Mock Employers
+    employers = [
+        ("CodeAlpha Innovations", "https://codealpha.tech", "Leading software development company focused on innovation and robust architecture."),
+        ("TechCorp Solutions", "https://techcorp.example.com", "Cloud infrastructure and enterprise application scaling specialists.")
+    ]
+    cursor.executemany('''
+        INSERT OR IGNORE INTO employers (id, company_name, website, description) 
+        VALUES (?, ?, ?, ?)
+    ''', [(i+1, e[0], e[1], e[2]) for i, e in enumerate(employers)])
+
+    # 2. Insert Mock Job Listings
+    jobs = [
+        (1, "Backend Developer Intern", "Build efficient REST APIs and handle server-side configurations using Flask and SQLite.", "Remote", "Internship", "Unpaid / Academic Credit"),
+        (1, "Junior Python Engineer", "Maintain server architectures, integrate databases, and optimize backend operational processing workflows.", "New York, NY", "Full-Time", "$75,000 - $90,000"),
+        (2, "Cloud Infrastructure Engineer", "Manage Docker environments, orchestrate data storage layers, and maintain reliable data pipes.", "Remote", "Full-Time", "$110,000 - $130,000")
+    ]
+    cursor.executemany('''
+        INSERT OR IGNORE INTO job_listings (id, employer_id, title, description, location, job_type, salary_range)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', [(i+1, j[0], j[1], j[2], j[3], j[4], j[5]) for i, j in enumerate(jobs)])
+
+    # 3. Insert Mock Candidates
+    candidates = [
+        ("alex_developer", "Python, Flask, SQLite, Git", "Motivated software engineering student specializing in robust full-stack application logic."),
+        ("priya_backend", "Django, PostgreSQL, REST APIs, Docker", "Detail-oriented backend engineer focused on clean relational schemas and scalable server code.")
+    ]
+    cursor.executemany('''
+        INSERT OR IGNORE INTO candidates (id, username, skills, resume_text)
+        VALUES (?, ?, ?, ?)
+    ''', [(i+1, c[0], c[1], c[2]) for i, c in enumerate(candidates)])
+
+    # 4. Insert Mock Applications
+    applications = [
+        (1, 1, "I am highly excited about the backend internship opportunity at CodeAlpha and look forward to building robust systems.", "REVIEWING"),
+        (2, 2, "I have experience implementing stable Flask entry points and designing relational databases.", "PENDING")
+    ]
+    cursor.executemany('''
+        INSERT OR IGNORE INTO applications (id, job_id, candidate_id, cover_letter, status)
+        VALUES (?, ?, ?, ?, ?)
+    ''', [(i+1, a[0], a[1], a[2], a[3]) for i, a in enumerate(applications)])
+
+    conn.commit()
+    conn.close()
+    print("✅ Database successfully seeded! Open your Streamlit dashboard to view records.")
+
+if __name__ == "__main__":
+    seed_database()
